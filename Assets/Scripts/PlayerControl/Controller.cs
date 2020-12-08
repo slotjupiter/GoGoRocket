@@ -12,9 +12,10 @@ public class Controller : MonoBehaviour
     public Transform spawnrocketPoint;
     [Header("--- Build Crane ---")]
     public GameObject buildCrane;
-    public float craneUpSpeed;
+    public float craneUpSpeed,craneUpDistance;
     [HideInInspector]
     public CraneMovement craneMovement;
+    public RocketController rocketController;
 
     GameObject RocketParent;
     Rigidbody2D _spawnrigidbody;
@@ -23,11 +24,13 @@ public class Controller : MonoBehaviour
     bool createRK,dropRK = false;
     int modeControl;
     int index = 0;
+    int childIndex;
 
     private void Start() {
        _spawnrigidbody = spawnObject.GetComponent<Rigidbody2D>();
        RocketParent = GameObject.Find("RocketMain");
        modeControl = 1;
+     
        starterRocket();
     }
 
@@ -38,7 +41,11 @@ public class Controller : MonoBehaviour
         {  
            BuildRocketControl();
         }
-    
+        else if (modeControl == 2)
+        {
+            RocketFlyControl();
+        }
+        CheckChildIndex(RocketParent);
     }
 
     void BuildRocketControl()
@@ -65,8 +72,9 @@ public class Controller : MonoBehaviour
             index++;
             rocketBlock = Instantiate(rocketParts[index], spawnrocketPoint.transform.position, transform.rotation);
             dropRK = false;
-            craneMovement.goUp(1.0f);
+            craneMovement.goUp(1f);
             craneMovement.speed += craneUpSpeed;
+            craneMovement.distanceMove += craneUpDistance;
         }
         _rocketJoint = rocketBlock.AddComponent<FixedJoint2D>();
         _rocketJoint.connectedBody = _spawnrigidbody;
@@ -78,16 +86,27 @@ public class Controller : MonoBehaviour
     {   
         dropRK = true;
         Destroy(_rocketJoint);
-        StartCoroutine(CreateRocket(1f));
+        //  craneMovement.goUp(0.5f);
+        StartCoroutine(CreateRocket(0.8f));
          if(index == rocketParts.Length - 1)
             {
                 buildCrane.SetActive(false);
+                modeControl = 2;
             }
     }
 
     void RocketFlyControl()
     {
+         if(Input.GetKeyDown(KeyCode.Space))
+        {  
+           RocketParent.transform.GetChild(0).gameObject.AddComponent<RocketController>();
+        }
+    }
 
+    private void CheckChildIndex(GameObject parent)
+    {
+        parent.transform.GetChild(0);
+        // Debug.Log("Child = " + parent.transform.GetChild(0));
     }
 
 }

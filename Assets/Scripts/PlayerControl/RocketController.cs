@@ -4,15 +4,27 @@ using UnityEngine;
 
 public class RocketController : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    RocketCombine rocketCombine;
+    Rigidbody2D rcRigid;
+    public void Start()
     {
-        
+        rcRigid = gameObject.GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        float yAxis = Input.GetAxisRaw("Vertical");
+        RocketForward(yAxis);
+    }
+
+    private void RocketForward(float amount)
+    {
+        Vector2 force = (transform.up * amount) * 400;
+        if(rcRigid)
+        {
+             rcRigid.AddForce(force);
+        }
+       
     }
 }

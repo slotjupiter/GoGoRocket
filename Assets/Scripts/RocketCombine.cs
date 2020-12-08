@@ -9,9 +9,12 @@ public class RocketCombine : MonoBehaviour
     GameObject rocketBlock;
     GameObject RocketParent;
     FixedJoint2D rocketJoint;
+    public Rigidbody2D rocketRigid;
 
    private void Start() {
        rocketBlock = gameObject;
+       rocketRigid = GetComponent<Rigidbody2D>();
+       rocketRigid.constraints = RigidbodyConstraints2D.FreezeRotation;
        RocketParent = GameObject.Find("RocketMain");
    }
 
@@ -53,19 +56,25 @@ public class RocketCombine : MonoBehaviour
                     rocketJoint.enableCollision = false; 
                     _entered = true;
                 }  
-            } else { Destroy(gameObject); }
+            } 
+            else 
+            { 
+                Destroy(gameObject); 
+            }
         }
-       
-      
       
     }
+
+    
  
+
     public void rocketConnected()
     {
         if(_blockConnected == true)
         {
             rocketBlock.transform.SetParent(RocketParent.transform);
             //  rocketBlock.transform.SetSiblingIndex(0);
+            
         }
     }
     
