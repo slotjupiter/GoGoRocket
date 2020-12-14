@@ -6,25 +6,23 @@ public class RocketController : MonoBehaviour
 {
     RocketCombine rocketCombine;
     Rigidbody2D rcRigid;
+    [HideInInspector]
+   
+    float rocketPower;
     public void Start()
     {
         rcRigid = gameObject.GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        float yAxis = Input.GetAxisRaw("Vertical");
-        RocketForward(yAxis);
-    }
-
-    private void RocketForward(float amount)
-    {
-        Vector2 force = (transform.up * amount) * 400;
+    public void RocketForward(float amount,float blockAmount)
+    {   
+        rocketPower = blockAmount * 50;
+        Vector2 force = (transform.up * amount) * rocketPower;
         if(rcRigid)
         {
              rcRigid.AddForce(force);
         }
        
     }
+
 }

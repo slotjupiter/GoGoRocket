@@ -15,33 +15,39 @@ public class Controller : MonoBehaviour
     public float craneUpSpeed,craneUpDistance;
     [HideInInspector]
     public CraneMovement craneMovement;
-    public RocketController rocketController;
+    
+    RocketController rocketController;
 
     GameObject RocketParent;
     Rigidbody2D _spawnrigidbody;
     FixedJoint2D _rocketJoint;
   
-    bool createRK,dropRK = false;
-    int modeControl;
+    bool createRK,dropRK,startControlRocket = false;
+    bool ModeRocket = false;
+    int _modeControl;
     int index = 0;
     int childIndex;
+    public float rocketMultiple;
 
     private void Start() {
        _spawnrigidbody = spawnObject.GetComponent<Rigidbody2D>();
        RocketParent = GameObject.Find("RocketMain");
-       modeControl = 1;
+   
+       _modeControl = 1;
      
        starterRocket();
     }
 
     public void Update() {
         // Debug.Log("RPlength = " + rocketParts.Length + " "+ index);
+         rocketMultiple = RocketParent.transform.childCount;
+        // Debug.Log(rocketMultiple);
         craneMovement.goLeftRight();
-        if(modeControl == 1)
+        if(_modeControl == 1)
         {  
            BuildRocketControl();
         }
-        else if (modeControl == 2)
+        else if (_modeControl == 2)
         {
             RocketFlyControl();
         }
@@ -72,7 +78,7 @@ public class Controller : MonoBehaviour
             index++;
             rocketBlock = Instantiate(rocketParts[index], spawnrocketPoint.transform.position, transform.rotation);
             dropRK = false;
-            craneMovement.goUp(1f);
+            craneMovement.goUp(1.2f);
             craneMovement.speed += craneUpSpeed;
             craneMovement.distanceMove += craneUpDistance;
         }
@@ -87,20 +93,28 @@ public class Controller : MonoBehaviour
         dropRK = true;
         Destroy(_rocketJoint);
         //  craneMovement.goUp(0.5f);
-        StartCoroutine(CreateRocket(0.8f));
+        StartCoroutine(CreateRocket(0.5f));
          if(index == rocketParts.Length - 1)
             {
                 buildCrane.SetActive(false);
-                modeControl = 2;
+                _modeControl = 2;
             }
     }
 
     void RocketFlyControl()
-    {
-         if(Input.GetKeyDown(KeyCode.Space))
-        {  
-           RocketParent.transform.GetChild(0).gameObject.AddComponent<RocketController>();
+    {      
+        if(!startControlRocket)
+        {
+        RocketParent.transform.GetChild(0).gameObject.AddComponent<RocketController>();
+        rocketController = RocketParent.transform.GetChild(0).GetComponent<RocketController>();
+        
+        
+        startControlRocket = true;
         }
+        float yAxis = Input.GetAxisRaw("Vertical");
+        rocketController.RocketForward(yAxis,rocketMultiple);
+       
+
     }
 
     private void CheckChildIndex(GameObject parent)
