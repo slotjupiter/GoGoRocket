@@ -30,12 +30,14 @@ public class RocketCombine : MonoBehaviour
             {   
                 _blockConnected = true; 
                 rocketConnected();
-                if(!_entered && contactPoint.y < centerPoint.y)
+                // if(!_entered && contactPoint.y < centerPoint.y)
+                 if(!_entered)
                 {
                     rocketJoint = rocketBlock.AddComponent<FixedJoint2D>();
                     rocketJoint.connectedBody = rocketCol.collider.transform.GetComponentInParent<Rigidbody2D>();
                     rocketJoint.autoConfigureConnectedAnchor = false;
                     rocketJoint.enableCollision = false; 
+                     rocketRigid.bodyType = RigidbodyType2D.Kinematic;
                     _entered = true;
                 }  
             }
@@ -48,12 +50,14 @@ public class RocketCombine : MonoBehaviour
             {   
                 _blockConnected = true; 
                 rocketConnected();
-                if(!_entered && contactPoint.y < centerPoint.y)
+                // if(!_entered && contactPoint.y < centerPoint.y)
+                if(!_entered)
                 {
                     rocketJoint = rocketBlock.AddComponent<FixedJoint2D>();
                     rocketJoint.connectedBody = rocketCol.collider.transform.GetComponentInParent<Rigidbody2D>();
                     rocketJoint.autoConfigureConnectedAnchor = false;
                     rocketJoint.enableCollision = false; 
+                    rocketRigid.bodyType = RigidbodyType2D.Kinematic;
                     _entered = true;
                 }  
             } 
@@ -62,7 +66,7 @@ public class RocketCombine : MonoBehaviour
                 Destroy(gameObject); 
             }
         }
-      
+        rocketRigid.constraints = RigidbodyConstraints2D.None;
     }
 
     
