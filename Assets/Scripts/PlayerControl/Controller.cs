@@ -21,17 +21,18 @@ public class Controller : MonoBehaviour
     GameObject RocketParent,rocketFirst;
     Rigidbody2D _spawnrigidbody;
     FixedJoint2D _rocketJoint;
+    Transform RocketParentTransform;
   
     bool createRK,dropRK,startControlRocket = false;
     int _modeControl;
     int index = 0;
     int childIndex;
-    float rocketMultiple;
+    float rocketPartsAmount;
 
     private void Start() {
        _spawnrigidbody = spawnObject.GetComponent<Rigidbody2D>();
        RocketParent = GameObject.Find("RocketMain");
-   
+       RocketParentTransform = RocketParent.transform;
        _modeControl = 1;
      
        starterRocket();
@@ -39,14 +40,14 @@ public class Controller : MonoBehaviour
 
     public void Update() {
         // Debug.Log("RPlength = " + rocketParts.Length + " "+ index);
-        //  rocketMultiple = RocketParent.transform.childCount;
+         rocketPartsAmount = RocketParent.transform.childCount;
         // Debug.Log(rocketMultiple);
         craneMovement.goLeftRight();
         if(_modeControl == 1)
         {  
            BuildRocketControl();
         }
-      
+        Transformfunc.CenterOnChild(RocketParentTransform);
         CheckChildIndex(RocketParent);
     }
 
@@ -111,12 +112,14 @@ public class Controller : MonoBehaviour
         // RocketParent.transform.GetChild(0).gameObject.AddComponent<RocketController>();
         // rocketController = RocketParent.transform.GetChild(0).GetComponent<RocketController>();
         // rocketFirst = RocketParent.transform.GetChild(0).gameObject;
+        
         Rigidbody2D RPrigid = RocketParent.AddComponent<Rigidbody2D>();
         RocketParent.AddComponent<RocketController>();
         // RocketParent.transform.GetChild(0).GetComponent<Rigidbody2D>();
         rocketController = RocketParent.GetComponent<RocketController>();
        
         RPrigid.gravityScale = 1;
+    
         RPrigid.useAutoMass = true;
 
 
@@ -125,7 +128,7 @@ public class Controller : MonoBehaviour
         
         float yAxis = Input.GetAxis("Vertical");
         float xAxis = Input.GetAxis("Horizontal");
-        rocketController.RocketForward(yAxis);
+        rocketController.RocketForward(yAxis,rocketPartsAmount);
         rocketController.RocketRotate(RocketParent,xAxis * -3);
        
        
@@ -134,7 +137,7 @@ public class Controller : MonoBehaviour
 
     private void CheckChildIndex(GameObject parent)
     {   
-        rocketMultiple = parent.transform.childCount;
+        // rocketPartsAmount = parent.transform.childCount;
         parent.transform.GetChild(0);
         // Debug.Log("Child = " + parent.transform.GetChild(0));
     }

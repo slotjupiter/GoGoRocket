@@ -33,13 +33,21 @@ public class RocketCombine : MonoBehaviour
                 // if(!_entered && contactPoint.y < centerPoint.y)
                  if(!_entered)
                 {
-                    rocketJoint = rocketBlock.AddComponent<FixedJoint2D>();
-                    rocketJoint.connectedBody = rocketCol.collider.transform.GetComponentInParent<Rigidbody2D>();
-                    rocketJoint.autoConfigureConnectedAnchor = false;
-                    rocketJoint.enableCollision = false; 
-                     rocketRigid.bodyType = RigidbodyType2D.Kinematic;
+                    // rocketJoint = rocketBlock.AddComponent<FixedJoint2D>();
+                    // rocketJoint.connectedBody = rocketCol.collider.transform.GetComponentInParent<Rigidbody2D>();
+                    // rocketJoint.autoConfigureConnectedAnchor = false;
+                    // rocketJoint.enableCollision = false; 
+                    
+                    //   rocketJoint.dampingRatio = 1;
+                    // rocketRigid.simulated = false;
                     _entered = true;
+
+                    Destroy(rocketRigid);
                 }  
+            }
+            else 
+            {
+                  Destroy(rocketRigid);
             }
         }
         
@@ -53,12 +61,16 @@ public class RocketCombine : MonoBehaviour
                 // if(!_entered && contactPoint.y < centerPoint.y)
                 if(!_entered)
                 {
-                    rocketJoint = rocketBlock.AddComponent<FixedJoint2D>();
-                    rocketJoint.connectedBody = rocketCol.collider.transform.GetComponentInParent<Rigidbody2D>();
-                    rocketJoint.autoConfigureConnectedAnchor = false;
-                    rocketJoint.enableCollision = false; 
-                    rocketRigid.bodyType = RigidbodyType2D.Kinematic;
+                    // rocketJoint = rocketBlock.AddComponent<FixedJoint2D>();
+                    // rocketJoint.connectedBody = rocketCol.collider.transform.GetComponentInParent<Rigidbody2D>();
+                    // rocketJoint.autoConfigureConnectedAnchor = false;
+                    // rocketJoint.enableCollision = false; 
+                    // rocketRigid.bodyType = RigidbodyType2D.Kinematic;
+                    // rocketJoint.dampingRatio = 1;
+                    // rocketRigid.simulated = false;
                     _entered = true;
+
+                      Destroy(rocketRigid);
                 }  
             } 
             else 
@@ -66,7 +78,7 @@ public class RocketCombine : MonoBehaviour
                 Destroy(gameObject); 
             }
         }
-        rocketRigid.constraints = RigidbodyConstraints2D.None;
+        // rocketRigid.constraints = RigidbodyConstraints2D.None;
     }
 
     

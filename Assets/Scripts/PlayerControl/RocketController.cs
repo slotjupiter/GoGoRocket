@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class RocketController : MonoBehaviour
 {   
-    public float speed = 20f;
-    public float rkVelocity = 3;
+    public float speed = 50f;
+    public float rkVelocity = 1;
     public float rotationSp = 3;
     RocketCombine rocketCombine;
     Rigidbody2D rcRigid;
     Vector3 force;
-    float rocketPower;
+    float sumSpeed;
     public void Start()
     {
         rcRigid = gameObject.GetComponent<Rigidbody2D>();
@@ -28,11 +28,11 @@ public class RocketController : MonoBehaviour
 
         rcRigid.velocity = new Vector2(x,y);
     }
-    public void RocketForward(float amount)
-    {   
+    public void RocketForward(float amount,float blockAmount)
+    {   RocketVelocity();
         // float speedz = speed * rocketChild;
-        // rocketPower = blockAmount * 10;
-        force = (transform.up * amount) * speed;
+        sumSpeed = blockAmount * speed;
+        force = (transform.up * amount) * sumSpeed * Time.deltaTime;
         if(rcRigid)
         {
              rcRigid.AddForce(force);
