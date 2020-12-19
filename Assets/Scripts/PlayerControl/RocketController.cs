@@ -5,7 +5,7 @@ using UnityEngine;
 public class RocketController : MonoBehaviour
 {   
     public float speed = 50f;
-    public float rkVelocity = 1;
+    public float rkVelocity = 4;
     public float rotationSp = 3;
     RocketCombine rocketCombine;
     Rigidbody2D rcRigid;
@@ -22,7 +22,8 @@ public class RocketController : MonoBehaviour
     //    RocketForward(yAxis);
     // }
     private void RocketVelocity()
-    {
+    {   
+      
         float x = Mathf.Clamp(rcRigid.velocity.x, -rkVelocity,rkVelocity);
         float y = Mathf.Clamp(rcRigid.velocity.y, -rkVelocity,rkVelocity);
 
@@ -32,7 +33,7 @@ public class RocketController : MonoBehaviour
     {   RocketVelocity();
         // float speedz = speed * rocketChild;
         sumSpeed = blockAmount * speed;
-        force = (transform.up * amount) * sumSpeed * Time.deltaTime;
+        force = (transform.up * amount) * sumSpeed;
         if(rcRigid)
         {
              rcRigid.AddForce(force);
@@ -42,7 +43,7 @@ public class RocketController : MonoBehaviour
 
     public void RocketRotate(GameObject rkobject,float amount)
     {
-        rkobject.transform.Rotate(0,0,amount);
+        rkobject.transform.Rotate(0,0,amount * -rotationSp);
     }
 
 }

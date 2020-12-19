@@ -18,15 +18,15 @@ public class RocketCombine : MonoBehaviour
        RocketParent = GameObject.Find("RocketMain");
    }
 
-    private void OnCollisionEnter2D(Collision2D rocketCol) {
-        Collider2D collider = rocketCol.collider;
-        Vector3 contactPoint = rocketCol.contacts[0].point;
+    private void OnCollisionEnter2D(Collision2D other) {
+        Collider2D collider = other.collider;
+        Vector3 contactPoint = other.contacts[0].point;
         Vector3 centerPoint = collider.bounds.center;
         
         //BaseRocketComponent Collision Condition
         if(gameObject.tag == "BaseRocketComponent")
         {
-            if(rocketCol.collider.tag == "RocketComponent") 
+            if(other.collider.tag == "RocketComponent") 
             {   
                 _blockConnected = true; 
                 rocketConnected();
@@ -34,7 +34,7 @@ public class RocketCombine : MonoBehaviour
                  if(!_entered)
                 {
                     // rocketJoint = rocketBlock.AddComponent<FixedJoint2D>();
-                    // rocketJoint.connectedBody = rocketCol.collider.transform.GetComponentInParent<Rigidbody2D>();
+                    // rocketJoint.connectedBody = other.collider.transform.GetComponentInParent<Rigidbody2D>();
                     // rocketJoint.autoConfigureConnectedAnchor = false;
                     // rocketJoint.enableCollision = false; 
                     
@@ -47,14 +47,14 @@ public class RocketCombine : MonoBehaviour
             }
             else 
             {
-                  Destroy(rocketRigid);
+                //   Destroy(rocketRigid);
             }
         }
         
         //RocketComponent Collision Condition destroy when face the ground
          if(gameObject.tag == "RocketComponent")
         {
-            if(rocketCol.collider.tag == "RocketComponent" || rocketCol.collider.tag == "BaseRocketComponent") 
+            if(other.collider.tag == "RocketComponent" || other.collider.tag == "BaseRocketComponent") 
             {   
                 _blockConnected = true; 
                 rocketConnected();
@@ -62,7 +62,7 @@ public class RocketCombine : MonoBehaviour
                 if(!_entered)
                 {
                     // rocketJoint = rocketBlock.AddComponent<FixedJoint2D>();
-                    // rocketJoint.connectedBody = rocketCol.collider.transform.GetComponentInParent<Rigidbody2D>();
+                    // rocketJoint.connectedBody = other.collider.transform.GetComponentInParent<Rigidbody2D>();
                     // rocketJoint.autoConfigureConnectedAnchor = false;
                     // rocketJoint.enableCollision = false; 
                     // rocketRigid.bodyType = RigidbodyType2D.Kinematic;
@@ -73,7 +73,7 @@ public class RocketCombine : MonoBehaviour
                       Destroy(rocketRigid);
                 }  
             } 
-            else 
+            else if(other.collider.tag == "Ground")
             { 
                 Destroy(gameObject); 
             }
@@ -81,6 +81,16 @@ public class RocketCombine : MonoBehaviour
         // rocketRigid.constraints = RigidbodyConstraints2D.None;
     }
 
+    private void OnCollisionExit2D(Collision2D other) {
+      
+        if(_entered == true)
+        {  
+            _blockConnected = false;
+            gameObject.transform.parent = null;
+        Destroy(gameObject,1f);
+        }
+        
+    }
     
  
 

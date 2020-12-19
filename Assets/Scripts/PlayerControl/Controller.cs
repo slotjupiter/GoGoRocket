@@ -49,6 +49,18 @@ public class Controller : MonoBehaviour
         }
         Transformfunc.CenterOnChild(RocketParentTransform);
         CheckChildIndex(RocketParent);
+
+        if(_modeControl == 2)
+        {
+            if(Input.GetKeyDown(KeyCode.Escape))
+            {   
+                RocketParentTransform.GetChild(0).gameObject.AddComponent<Rigidbody2D>();
+                RocketParentTransform.GetChild(0).gameObject.tag = "EmptyFuel";
+                RocketParentTransform.GetChild(0).position += Vector3.down * Time.deltaTime;
+                RocketParentTransform.GetChild(0).parent = null;
+           
+        }
+        }
     }
 
     private void FixedUpdate() {
@@ -129,7 +141,9 @@ public class Controller : MonoBehaviour
         float yAxis = Input.GetAxis("Vertical");
         float xAxis = Input.GetAxis("Horizontal");
         rocketController.RocketForward(yAxis,rocketPartsAmount);
-        rocketController.RocketRotate(RocketParent,xAxis * -3);
+        rocketController.RocketRotate(RocketParent,xAxis);
+
+       
        
        
 

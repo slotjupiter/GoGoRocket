@@ -8,6 +8,8 @@ TagManager:
   - RocketComponent
   - BaseRocketComponent
   - Ground
+  - Rocket
+  - EmptyFuel
   layers:
   - Default
   - TransparentFX
