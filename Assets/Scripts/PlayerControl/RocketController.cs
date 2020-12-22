@@ -4,46 +4,50 @@ using UnityEngine;
 
 public class RocketController : MonoBehaviour
 {   
-    public float speed = 50f;
-    public float rkVelocity = 4;
-    public float rotationSp = 3;
     RocketCombine rocketCombine;
     Rigidbody2D rcRigid;
     Vector3 force;
     float sumSpeed;
+    public Vector2 lastPosition;
+
     public void Start()
     {
         rcRigid = gameObject.GetComponent<Rigidbody2D>();
-     
+        // lastPosition = gameObject.transform.position;
     }
 
-    // private void FixedUpdate() {
-    //         float yAxis = Input.GetAxis("Vertical");
-    //    RocketForward(yAxis);
-    // }
-    private void RocketVelocity()
+    public void RocketVelocity(float rcVelocity)
     {   
-      
-        float x = Mathf.Clamp(rcRigid.velocity.x, -rkVelocity,rkVelocity);
-        float y = Mathf.Clamp(rcRigid.velocity.y, -rkVelocity,rkVelocity);
+        float x = Mathf.Clamp(rcRigid.velocity.x, -rcVelocity,rcVelocity);
+        float y = Mathf.Clamp(rcRigid.velocity.y, -rcVelocity,rcVelocity);
 
         rcRigid.velocity = new Vector2(x,y);
     }
-    public void RocketForward(float amount,float blockAmount)
-    {   RocketVelocity();
-        // float speedz = speed * rocketChild;
+    public void RocketForward(float amount,float blockAmount,float speed)
+    {   
         sumSpeed = blockAmount * speed;
-        force = (transform.up * amount) * sumSpeed;
+        force = (transform.up * amount) * sumSpeed * Time.deltaTime;
+
         if(rcRigid)
         {
-             rcRigid.AddForce(force);
+            rcRigid.AddForce(force);
         }
        
     }
 
-    public void RocketRotate(GameObject rkobject,float amount)
+    public void RocketRotate(GameObject rkobject,float amount,float rotationSpeed)
     {
-        rkobject.transform.Rotate(0,0,amount * -rotationSp);
+        rkobject.transform.Rotate(0,0,amount * -rotationSpeed);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other) {
+        if(gameObject.tag == "Rocket")
+        {
+            if(other.tag == "SpaceZone")
+            {
+                rcRigid.gravityScale = 0;
+            }
+        }
     }
 
 }

@@ -19,4 +19,13 @@ public static class Transformfunc
          foreach(var C in childs)
              C.parent = aParent;
      }    
+
+     public static void ChangeChildTag(this Transform aParent)
+     {
+         var childs = aParent.Cast<Transform>().ToList(); 
+         foreach(var C in childs)
+         {
+             C.tag = "Rocket";
+         }
+     }
  }

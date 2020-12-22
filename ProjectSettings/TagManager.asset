@@ -10,6 +10,7 @@ TagManager:
   - Ground
   - Rocket
   - EmptyFuel
+  - SpaceZone
   layers:
   - Default
   - TransparentFX
