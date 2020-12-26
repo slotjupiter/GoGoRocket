@@ -8,8 +8,10 @@ public class RocketCombine : MonoBehaviour
     bool _entered;
     GameObject rocketBlock;
     GameObject RocketParent;
+    GameObject Instanceparticle;
     FixedJoint2D rocketJoint;
     public Rigidbody2D rocketRigid;
+    public GameObject partsConnectedparticle;
 
    private void Start() {
        rocketBlock = gameObject;
@@ -41,13 +43,14 @@ public class RocketCombine : MonoBehaviour
                     //   rocketJoint.dampingRatio = 1;
                     // rocketRigid.simulated = false;
                     _entered = true;
-
+                    // Vector3 test = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y+1,gameObject.transform.position.z);
+                    // Instanceparticle = Instantiate(partsConnectedparticle, test, gameObject.transform.rotation);
                     Destroy(rocketRigid);
                 }  
             }
-            else 
+            else if(other.collider.tag == "Ground") 
             {
-                //   Destroy(rocketRigid);
+                  Destroy(rocketRigid);
             }
         }
         
@@ -69,7 +72,9 @@ public class RocketCombine : MonoBehaviour
                     // rocketJoint.dampingRatio = 1;
                     // rocketRigid.simulated = false;
                     _entered = true;
-
+                        Vector3 test = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y-1,gameObject.transform.position.z);
+                    Instanceparticle = Instantiate(partsConnectedparticle, test, gameObject.transform.rotation);
+                    Destroy(Instanceparticle,3f);
                       Destroy(rocketRigid);
                 }  
             } 
@@ -81,16 +86,16 @@ public class RocketCombine : MonoBehaviour
         // rocketRigid.constraints = RigidbodyConstraints2D.None;
     }
 
-    private void OnCollisionExit2D(Collision2D other) {
+    // private void OnCollisionExit2D(Collision2D other) {
       
-        if(_entered == true)
-        {  
-            _blockConnected = false;
-            gameObject.transform.parent = null;
-        Destroy(gameObject,1f);
-        }
+    //     if(_entered == true)
+    //     {  
+    //         _blockConnected = false;
+    //         gameObject.transform.parent = null;
+    //     Destroy(gameObject,1f);
+    //     }
         
-    }
+    // }
     
  
 

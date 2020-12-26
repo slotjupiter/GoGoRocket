@@ -16,13 +16,14 @@ public class Controller : MonoBehaviour
     public float craneUpSpeed,craneUpDistance;
     [HideInInspector]
     public CraneMovement craneMovement;
-    [HideInInspector]
+    // [HideInInspector]
     public FuelBar fuelBar;
     [Header("--- Rocket ---")]
     public float speed = 50f;
     public float rotationSpeed = 3f;
     public float rcVelocity = 4f;
     public  ParticleSystem rocketFlameParticle;
+    public GameObject fuelDecreaseParticle;
     [Header("--- Rocket Fuel UI ---")]
     public float fuel = 500f;
     public Text rocketPartsText;
@@ -35,25 +36,43 @@ public class Controller : MonoBehaviour
     FixedJoint2D _rocketJoint;
     Transform RocketParentTransform;
     Vector2 lastPosition;
+    ParticleSystem  _rocketParticle;
   
     bool createRK,dropRK,startControlRocket,ejectRK = false;
     int _modeControl;
     int index = 0;
     int childIndex;
-    float rocketPartsAmount,rocketFuelLeft,distanceTravelled;
+    public float rocketFuelLeft;
+    float rocketPartsAmount,distanceTravelled;
     
+    private void Awake() {
+        
+    }
+
     private void Start() {
        _spawnrigidbody = spawnObject.GetComponent<Rigidbody2D>();
        RocketParent = GameObject.Find("RocketMain");
+       rocketController = RocketParent.GetComponent<RocketController>();
        RocketParentTransform = RocketParent.transform;
        _modeControl = 1;
-       rocketFlameParticle.startLifetime = 0.1f;
+     
        starterRocket();
+          if(fuelBar != null)
+        {
+            
+            fuelBar.setMaxFuel(fuel);
+            rocketFuelLeft = fuel;
+        }
+        else
+        {
+            return;
+        }
+    
 
     }
 
     public void Update() {
-
+     
         rocketPartsAmount = RocketParent.transform.childCount;
 
         craneMovement.goLeftRight();
@@ -68,23 +87,28 @@ public class Controller : MonoBehaviour
         break;
 
         case 2:
+      
         FuelController();
         FuelBarUI();
-        fuelBar.setMaxFuel(fuel);
-        fuelBar.setFuel(rocketFuelLeft);
-        lastPosition = RocketParent.transform.position;
+       
+        // lastPosition = RocketParent.transform.position;
 
-            if(rocketFuelLeft < 0 && !ejectRK)
-            {    
+            if(rocketFuelLeft <= 0 && !ejectRK)
+            {   
+                rocketFuelLeft = 0;
                 distanceTravelled = 0;
                 RocketEjection();
                 ejectRK = true;
-                if(ejectRK)
+                if(ejectRK == true)
                 {
-                    ejectRK = false;
+                    fuelBar.setMaxFuel(fuel);
+                    rocketFuelLeft = fuel;
+                    if(rocketFuelLeft == fuel)
+                    {
+                        ejectRK = false;
+                    }
                 }
             }
-
         break;
         }
     }
@@ -104,7 +128,7 @@ public class Controller : MonoBehaviour
         }
     
     }
-
+    
     private void starterRocket()
     {
         rocketBlockStart = Instantiate(rocketParts[0], spawnrocketPoint.transform.position, transform.rotation);
@@ -150,18 +174,19 @@ public class Controller : MonoBehaviour
     }
 
     void RocketFlyControl()
-    {      
+    {    
         if(!startControlRocket)
         {
         Rigidbody2D RPrigid = RocketParent.AddComponent<Rigidbody2D>();
         RPrigid.gravityScale = 1;
         RPrigid.useAutoMass = true;
-        //  ParticleSystem rocketParticle = Instantiate(rocketFlameParticle,RocketParentTransform.GetChild(0).position, transform.rotation);
-        //  rocketParticle.SetParent(RocketParent.transform);
+
+        _rocketParticle = Instantiate(rocketFlameParticle,RocketParentTransform.position,Quaternion.Euler(90, 0, 0));
+        
         RocketParent.AddComponent<RocketController>();
         rocketController = RocketParent.GetComponent<RocketController>();
         startControlRocket = true;
-
+        
         }
         
         float yAxis = Input.GetAxis("Vertical");
@@ -169,15 +194,37 @@ public class Controller : MonoBehaviour
         rocketController.RocketForward(yAxis,rocketPartsAmount,speed);
         rocketController.RocketRotate(RocketParent,xAxis,rotationSpeed);
         rocketController.RocketVelocity(rcVelocity);
-        rocketFlameParticle.startLifetime = yAxis +1;
+       
+        Transform _rocketParentChildzero = RocketParentTransform.GetChild(0).transform;
+        _rocketParticle.transform.SetParent(_rocketParentChildzero);
+        _rocketParticle.transform.position = _rocketParentChildzero.transform.position;
+        _rocketParticle.startLifetime = yAxis + 0.5f;
 
     }
 
-    private void FuelController()
-    {
-        distanceTravelled += Vector2.Distance(RocketParent.transform.position, lastPosition);
+    public void FuelController()
+    {   
+        distanceTravelled = Vector2.Distance(RocketParent.transform.position, lastPosition);
         lastPosition = RocketParent.transform.position;
-        rocketFuelLeft = fuel - (Mathf.Abs(distanceTravelled));
+         
+        rocketFuelLeft = rocketFuelLeft - distanceTravelled;
+        if(rocketController.takeDamage == true)
+        {
+            FuelDecrease(50f);
+            rocketController.takeDamage = false;
+            GameObject InstanceparticleFuel = Instantiate(fuelDecreaseParticle,fuelBar.transform.position, 
+            fuelBar.transform.rotation);
+            Destroy(InstanceparticleFuel,1f);
+        }
+         fuelBar.setFuel(rocketFuelLeft);
+         
+    }
+
+    public void FuelDecrease(float damage)
+    {   
+        rocketFuelLeft -= damage;
+        // fuelBar.setFuel(rocketFuelLeft);
+       
     }
 
     private void RocketEjection()

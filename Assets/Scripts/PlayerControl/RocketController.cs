@@ -4,17 +4,23 @@ using UnityEngine;
 
 public class RocketController : MonoBehaviour
 {   
+    Controller controller;
     RocketCombine rocketCombine;
     Rigidbody2D rcRigid;
     Vector3 force;
     float sumSpeed;
-    public Vector2 lastPosition;
+    float magnitude = 100f;
+    
+    public float damage;
+    public bool takeDamage;
 
     public void Start()
-    {
+    {   
+        takeDamage = false;
         rcRigid = gameObject.GetComponent<Rigidbody2D>();
-        // lastPosition = gameObject.transform.position;
+        controller = GameObject.Find("ControlManager").GetComponent<Controller>();
     }
+
 
     public void RocketVelocity(float rcVelocity)
     {   
@@ -27,7 +33,7 @@ public class RocketController : MonoBehaviour
     {   
         sumSpeed = blockAmount * speed;
         force = (transform.up * amount) * sumSpeed * Time.deltaTime;
-
+      
         if(rcRigid)
         {
             rcRigid.AddForce(force);
@@ -43,11 +49,61 @@ public class RocketController : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other) {
         if(gameObject.tag == "Rocket")
         {
-            if(other.tag == "SpaceZone")
+            switch(other.tag)
             {
+                case "SpaceZone":
                 rcRigid.gravityScale = 0;
+                break;  
+                // case "Obstacle":
+                // takeDamage = true;
+                // rcRigid.velocity = -transform.position * 100;
+                // Debug.Log("Trigger");
+                // break;   
             }
-        }
+        }  
     }
+
+    public void OnCollisionEnter2D(Collision2D other) {
+
+                switch(other.collider.tag)
+                {
+                case "Obstacle":
+                takeDamage = true;
+                rcRigid.velocity = -transform.position * magnitude;
+                force.Normalize();
+                rcRigid.AddForce(-force * magnitude);
+     
+                break;
+                //  case "EmptyFuel":
+                // // Vector2 forcez = transform.position - other.transform.position;
+                // // forcez.Normalize();
+                //  hit = true;
+                // rcRigid.AddForce(-force * magnitude);
+                // Debug.Log("Empty");
+                // break;
+                }
+    }
+
+    public void OnCollisionExit2D(Collision2D other) {
+        switch(other.collider.tag)
+                {
+                case "Obstacle":
+                // Vector2 forcez = transform.position - other.transform.position;
+                // forcez.Normalize();
+                // controller.FuelDecrease(damage);
+                // damage = 0f;
+                 Debug.Log("Exit");
+                break;
+                //  case "EmptyFuel":
+                // // Vector2 forcez = transform.position - other.transform.position;
+                // // forcez.Normalize();
+                //  hit = true;
+                // rcRigid.AddForce(-force * magnitude);
+                // Debug.Log("Empty");
+                // break;
+                }
+    }
+
+
 
 }
