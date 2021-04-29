@@ -3,29 +3,29 @@
  
  public class CraneMovement : MonoBehaviour {
  
-     public float distanceMove = 1.5f;  // Amount to move left and right from the start point
-     public float speed = 2.0f; 
+    public float distanceMove = 1.5f;  
+    public float speed = 2.0f; 
+    public Transform craneBase,magnet;
+    Vector2 craneBasePos;
     Vector3 cranePos;
-    Vector3 _cp;
+    // float _cp;
  
-     public void Start () {
-         cranePos = transform.position;  
-     }
+    public void Start () 
+    {
+        cranePos = magnet.transform.position;  
+    }
      
-     public void goLeftRight()
-     {  Vector3  _cp = cranePos;
+    public void goLeftRight()
+     {  
+        Vector3  _cp = cranePos;
         _cp.x += distanceMove * Mathf.Sin (Time.time * speed);
-        transform.position = _cp;
+        magnet.transform.position = new Vector3(_cp.x,transform.position.y-0.5f,0);
      }
 
-     public void goUp(float upValue)
-     {      
-         cranePos = new Vector3(cranePos.x,cranePos.y + upValue,cranePos.z);
-        //  transform.position = cranePos;
-     }
-     void Update () {
-         
-     }
-
-
+    public void goUp(float UpValue)
+    {   Vector3  _cb = transform.position;
+        _cb.y = transform.position.y + UpValue;
+        transform.position = new Vector3(0,_cb.y,0);
+    }
+   
  }

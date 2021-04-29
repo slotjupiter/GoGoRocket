@@ -7,7 +7,9 @@ public static class Transformfunc
 {
     public static void CenterOnChild(this Transform aParent)
      {
-         var childs = aParent.Cast<Transform>().ToList();
+         if(aParent != null)
+         {
+             var childs = aParent.Cast<Transform>().ToList();
          var pos = Vector3.zero;
          foreach(var C in childs)
          {
@@ -17,7 +19,13 @@ public static class Transformfunc
          pos /= childs.Count;
          aParent.position = pos;
          foreach(var C in childs)
-             C.parent = aParent;
+             C.parent = aParent; 
+         }
+        else
+        {
+            return;
+        }
+        
      }    
 
      public static void ChangeChildTag(this Transform aParent)

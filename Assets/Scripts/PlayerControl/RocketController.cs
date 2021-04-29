@@ -4,23 +4,29 @@ using UnityEngine;
 
 public class RocketController : MonoBehaviour
 {   
+    SoundManager soundmanage;
     Controller controller;
     RocketCombine rocketCombine;
     Rigidbody2D rcRigid;
     Vector3 force;
     float sumSpeed;
-    float magnitude = 100f;
-    
+    float magnitude = 0.5f;
+    float skyValue;
+    float durationSkyChange = 1f;
     public float damage;
     public bool takeDamage;
+    
 
     public void Start()
     {   
+        skyValue = 0;
         takeDamage = false;
+
         rcRigid = gameObject.GetComponent<Rigidbody2D>();
         controller = GameObject.Find("ControlManager").GetComponent<Controller>();
-    }
+        soundmanage = FindObjectOfType<SoundManager>();
 
+    }
 
     public void RocketVelocity(float rcVelocity)
     {   
@@ -33,7 +39,7 @@ public class RocketController : MonoBehaviour
     {   
         sumSpeed = blockAmount * speed;
         force = (transform.up * amount) * sumSpeed * Time.deltaTime;
-      
+
         if(rcRigid)
         {
             rcRigid.AddForce(force);
@@ -46,6 +52,11 @@ public class RocketController : MonoBehaviour
         rkobject.transform.Rotate(0,0,amount * -rotationSpeed);
     }
 
+    public void RocketGravity(float gravity)
+    {
+        rcRigid.gravityScale = gravity;
+    }
+
     private void OnTriggerEnter2D(Collider2D other) {
         if(gameObject.tag == "Rocket")
         {
@@ -53,12 +64,29 @@ public class RocketController : MonoBehaviour
             {
                 case "SpaceZone":
                 rcRigid.gravityScale = 0;
+                skyValue += Time.deltaTime / durationSkyChange;
+                controller.mainCamera.backgroundColor = Color.Lerp(Color.white, Color.black, skyValue);
+                if(skyValue >= 1)
+                {
+                    skyValue = 1;
+                }
                 break;  
-                // case "Obstacle":
-                // takeDamage = true;
-                // rcRigid.velocity = -transform.position * 100;
-                // Debug.Log("Trigger");
-                // break;   
+
+                case "Earth":
+                rcRigid.gravityScale = 1;
+                skyValue -= Time.deltaTime / durationSkyChange;
+                controller.mainCamera.backgroundColor = Color.Lerp(Color.white, Color.black, skyValue);
+                if(skyValue <= 0)
+                {
+                    skyValue = 0;
+                }
+                break;
+
+                case "Finish":
+                controller.gameUiController.EndGame();
+                rcRigid.constraints = RigidbodyConstraints2D.FreezeAll;
+                controller.canControl = false;
+                break;
             }
         }  
     }
@@ -68,42 +96,14 @@ public class RocketController : MonoBehaviour
                 switch(other.collider.tag)
                 {
                 case "Obstacle":
+                soundmanage.Play("Hit",0f);
                 takeDamage = true;
                 rcRigid.velocity = -transform.position * magnitude;
                 force.Normalize();
                 rcRigid.AddForce(-force * magnitude);
-     
+                controller.ImpactEffect(other);
                 break;
-                //  case "EmptyFuel":
-                // // Vector2 forcez = transform.position - other.transform.position;
-                // // forcez.Normalize();
-                //  hit = true;
-                // rcRigid.AddForce(-force * magnitude);
-                // Debug.Log("Empty");
-                // break;
                 }
     }
-
-    public void OnCollisionExit2D(Collision2D other) {
-        switch(other.collider.tag)
-                {
-                case "Obstacle":
-                // Vector2 forcez = transform.position - other.transform.position;
-                // forcez.Normalize();
-                // controller.FuelDecrease(damage);
-                // damage = 0f;
-                 Debug.Log("Exit");
-                break;
-                //  case "EmptyFuel":
-                // // Vector2 forcez = transform.position - other.transform.position;
-                // // forcez.Normalize();
-                //  hit = true;
-                // rcRigid.AddForce(-force * magnitude);
-                // Debug.Log("Empty");
-                // break;
-                }
-    }
-
-
 
 }

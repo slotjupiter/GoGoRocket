@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
+using UnityEngine.Localization.Tables;
 public class Controller : MonoBehaviour
 {   
     [Header("--- Rocket Blocks ---")]
@@ -14,7 +16,7 @@ public class Controller : MonoBehaviour
     [Header("--- Build Crane ---")]
     public GameObject buildCrane;
     public float craneUpSpeed,craneUpDistance;
-    [HideInInspector]
+    // [HideInInspector]
     public CraneMovement craneMovement;
     // [HideInInspector]
     public FuelBar fuelBar;
@@ -28,28 +30,54 @@ public class Controller : MonoBehaviour
     public float fuel = 500f;
     public Text rocketPartsText;
     public Text rocketFuelNum;
-    
+    public float rocketFuelLeft;
+    [Header("--- Camera ---")]
+    [SerializeField] public Camera mainCamera;
+    [SerializeField]GameObject buildCam;
+    [SerializeField]GameObject rocketCam;
+    [Header("--- Game UI ---")]
+    [SerializeField] public GameUIController gameUiController;
+    [SerializeField] private Text distanceText;
+    [SerializeField] private Transform GoalPosition;
+    [SerializeField] private GameObject impactParticle;
+    [Header("--- Sound ---")]
+    [SerializeField] private SoundManager Soundmanager;
+    bool audioplay = false;
     RocketController rocketController;
 
-    GameObject RocketParent,rocketFirst;
+    GameObject RocketParent,rocketFirst,gameUI;
+    GameObject InstanceImpactParticle;
     Rigidbody2D _spawnrigidbody;
     FixedJoint2D _rocketJoint;
     Transform RocketParentTransform;
     Vector2 lastPosition;
     ParticleSystem  _rocketParticle;
-  
+
     bool createRK,dropRK,startControlRocket,ejectRK = false;
+    public bool canControl = true;
+    bool GAMEOVER = false;
+    bool canSpace = false;
     int _modeControl;
     int index = 0;
     int childIndex;
-    public float rocketFuelLeft;
-    float rocketPartsAmount,distanceTravelled;
+    float timer = 1f;
     
-    private void Awake() {
-        
-    }
-
+    float rocketPartsAmount,distanceTravelled;
+    float lower;
+  
     private void Start() {
+        
+        if(PlayerPrefs.HasKey("selected-locale"))
+        {   
+        string lang = PlayerPrefs.GetString("selected-locale");
+        LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.GetLocale(lang);
+        PlayerPrefs.Save();
+        }
+
+        Soundmanager.Play("BGM",0.1f);
+        buildCam.SetActive(true);
+
+       GameUIController gameUiController = GetComponent<GameUIController>();
        _spawnrigidbody = spawnObject.GetComponent<Rigidbody2D>();
        RocketParent = GameObject.Find("RocketMain");
        rocketController = RocketParent.GetComponent<RocketController>();
@@ -67,18 +95,16 @@ public class Controller : MonoBehaviour
         {
             return;
         }
-    
-
     }
 
     public void Update() {
      
         rocketPartsAmount = RocketParent.transform.childCount;
-
+      
         craneMovement.goLeftRight();
 
         Transformfunc.CenterOnChild(RocketParentTransform);
-        CheckChildIndex(RocketParent);
+        CheckChild(RocketParent);
         
         switch(_modeControl)
         {
@@ -87,18 +113,28 @@ public class Controller : MonoBehaviour
         break;
 
         case 2:
-      
+        CameraController.CameraChange(buildCam,rocketCam);
+        if(canControl)
+        {
+         float xAxis = Input.GetAxis("Horizontal");
+         rocketController.RocketRotate(RocketParent,xAxis,rotationSpeed);
+        }
+        
+        DistanceToMoon();
         FuelController();
         FuelBarUI();
        
-        // lastPosition = RocketParent.transform.position;
-
             if(rocketFuelLeft <= 0 && !ejectRK)
             {   
                 rocketFuelLeft = 0;
                 distanceTravelled = 0;
+
+                if(rocketPartsAmount != 1)
+                {
                 RocketEjection();
-                ejectRK = true;
+                ejectRK = true; 
+                }
+                
                 if(ejectRK == true)
                 {
                     fuelBar.setMaxFuel(fuel);
@@ -109,12 +145,14 @@ public class Controller : MonoBehaviour
                     }
                 }
             }
+
         break;
+
         }
     }
 
     private void FixedUpdate() {
-          if (_modeControl == 2)
+          if (_modeControl == 2 && canControl)
         {
             RocketFlyControl();
         }
@@ -122,11 +160,15 @@ public class Controller : MonoBehaviour
 
     private void BuildRocketControl()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {  
-           DropRocket();
+        timer += Time.deltaTime;
+        if ( timer >= 0.5f )
+        {
+            if(Input.GetKeyDown(KeyCode.Space))
+            {  
+            DropRocket();
+            timer = 0;
+            }
         }
-    
     }
     
     private void starterRocket()
@@ -135,19 +177,19 @@ public class Controller : MonoBehaviour
         rocketBlockStart.transform.SetParent(RocketParent.transform);
         _rocketJoint = rocketBlockStart.AddComponent<FixedJoint2D>();
         _rocketJoint.connectedBody = _spawnrigidbody;
+        _rocketJoint.autoConfigureConnectedAnchor = false;
          
     }
     IEnumerator CreateRocket(float timeSpawn)
     {   
-        if(dropRK)
-        {   yield return new WaitForSeconds(timeSpawn); 
+           yield return new WaitForSeconds(timeSpawn); 
             index++;
             rocketBlock = Instantiate(rocketParts[index], spawnrocketPoint.transform.position, transform.rotation);
             dropRK = false;
-            craneMovement.goUp(1.2f);
+            craneMovement.goUp(2f);
             craneMovement.speed += craneUpSpeed;
             craneMovement.distanceMove += craneUpDistance;
-        }
+        
         _rocketJoint = rocketBlock.AddComponent<FixedJoint2D>();
         _rocketJoint.connectedBody = _spawnrigidbody;
     } 
@@ -163,8 +205,10 @@ public class Controller : MonoBehaviour
         dropRK = true;
 
         Destroy(_rocketJoint);
-
-        StartCoroutine(CreateRocket(0.5f));
+        if(dropRK)
+        {
+           StartCoroutine(CreateRocket(1f)); 
+        }
          if(index == rocketParts.Length - 1)
             {   
                 StartCoroutine(ChangeTagChild(0.5f));
@@ -186,13 +230,23 @@ public class Controller : MonoBehaviour
         RocketParent.AddComponent<RocketController>();
         rocketController = RocketParent.GetComponent<RocketController>();
         startControlRocket = true;
-        
         }
         
         float yAxis = Input.GetAxis("Vertical");
-        float xAxis = Input.GetAxis("Horizontal");
+        
+         if(yAxis >= 0.1 && !audioplay)
+         {
+            Soundmanager.Play("RocketFire",0.2f);
+            audioplay = true;
+         }
+         else if(yAxis == 0 && audioplay)
+         {
+            audioplay = false;
+            Soundmanager.Stop("RocketFire",0.2f);
+         }
+        
         rocketController.RocketForward(yAxis,rocketPartsAmount,speed);
-        rocketController.RocketRotate(RocketParent,xAxis,rotationSpeed);
+   
         rocketController.RocketVelocity(rcVelocity);
        
         Transform _rocketParentChildzero = RocketParentTransform.GetChild(0).transform;
@@ -200,6 +254,12 @@ public class Controller : MonoBehaviour
         _rocketParticle.transform.position = _rocketParentChildzero.transform.position;
         _rocketParticle.startLifetime = yAxis + 0.5f;
 
+    }
+
+    void DistanceToMoon()
+    {
+        float distanceBetween = Vector2.Distance(RocketParent.transform.position,GoalPosition.transform.position);
+        distanceText.text = (Mathf.RoundToInt(distanceBetween) * 100).ToString();
     }
 
     public void FuelController()
@@ -222,9 +282,7 @@ public class Controller : MonoBehaviour
 
     public void FuelDecrease(float damage)
     {   
-        rocketFuelLeft -= damage;
-        // fuelBar.setFuel(rocketFuelLeft);
-       
+        rocketFuelLeft -= damage;   
     }
 
     private void RocketEjection()
@@ -242,11 +300,35 @@ public class Controller : MonoBehaviour
         rocketFuelNum.text = "" + Mathf.RoundToInt(rocketFuelLeft/5);
     }
 
-    private void CheckChildIndex(GameObject parent)
+    
+    private void CheckChild(GameObject parent)
     {   
-        // rocketPartsAmount = parent.transform.childCount;
-        parent.transform.GetChild(0);
-        // Debug.Log("Child = " + parent.transform.GetChild(0));
+        if(parent.transform.childCount == 1 && rocketFuelLeft <= 0)
+        {   
+            canControl = false;
+            GAMEOVER = true;
+
+            rocketController.RocketGravity(1f);
+            rocketFuelLeft = 0;
+
+            gameUiController.GameOver();
+
+            if(GAMEOVER && Input.GetKeyDown(KeyCode.Space))
+            {
+                gameUiController.ResetGame();
+           
+            }
+        } 
+        
     }
 
+    public void ImpactEffect(Collision2D col) 
+    {   
+        foreach (ContactPoint2D contact in col.contacts)
+        {
+        InstanceImpactParticle = Instantiate(impactParticle, contact.point, Quaternion.identity);
+        }
+        Destroy(InstanceImpactParticle,1f);
+    }
+    
 }

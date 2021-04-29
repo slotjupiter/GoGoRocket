@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: LocaleTable Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: LocaleTable
+  m_TableCollectionNameGuidString: 278fb52c09ad68f49a15e0329e343680
+  m_Entries:
+  - m_Id: 21240913920
+    m_Key: spacetostart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4533661900800
+    m_Key: rocketnumber_5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1249951028781056
+    m_Key: retry_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2639887657246720
+    m_Key: esc_toskip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5235649146691584
+    m_Key: distance_to_moon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5552354490228736
+    m_Key: kilometer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21903970369708032
+    m_Key: end_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21906716284067840
+    m_Key: end_text2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21907264995500032
+    m_Key: end_text4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22569083665817600
+    m_Key: end_text3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22834150013575168
+    m_Key: rocketnumber_1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22834676088348672
+    m_Key: rocketnumber_2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22834822939320320
+    m_Key: rocketnumber_3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22834976320823296
+    m_Key: rocketnumber_4
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    id: 0
+  references:
+    version: 1
+    00000000:
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables,
+        asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1610012743803
