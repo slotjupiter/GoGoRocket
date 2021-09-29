@@ -33,19 +33,10 @@ public class RocketCombine : MonoBehaviour
             {   
                 _blockConnected = true; 
                 rocketConnected();
-                // if(!_entered && contactPoint.y < centerPoint.y)
+              
                  if(!_entered)
                 {
-                    // rocketJoint = rocketBlock.AddComponent<FixedJoint2D>();
-                    // rocketJoint.connectedBody = other.collider.transform.GetComponentInParent<Rigidbody2D>();
-                    // rocketJoint.autoConfigureConnectedAnchor = false;
-                    // rocketJoint.enableCollision = false; 
-                    
-                    //   rocketJoint.dampingRatio = 1;
-                    // rocketRigid.simulated = false;
                     _entered = true;
-                    // Vector3 test = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y+1,gameObject.transform.position.z);
-                    // Instanceparticle = Instantiate(partsConnectedparticle, test, gameObject.transform.rotation);
                     Destroy(rocketRigid);
                 }  
             }
@@ -62,21 +53,13 @@ public class RocketCombine : MonoBehaviour
             {   
                 _blockConnected = true; 
                 rocketConnected();
-                // if(!_entered && contactPoint.y < centerPoint.y)
+    
                 if(!_entered)
                 {
-                    // rocketJoint = rocketBlock.AddComponent<FixedJoint2D>();
-                    // rocketJoint.connectedBody = other.collider.transform.GetComponentInParent<Rigidbody2D>();
-                    // rocketJoint.autoConfigureConnectedAnchor = false;
-                    // rocketJoint.enableCollision = false; 
-                    // rocketRigid.bodyType = RigidbodyType2D.Kinematic;
-                    // rocketJoint.dampingRatio = 1;
-                    // rocketRigid.simulated = false;
-                    _entered = true;
-                        Vector3 particlePos = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y-1,gameObject.transform.position.z);
+                    Vector3 particlePos = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y-1,gameObject.transform.position.z);
                     Instanceparticle = Instantiate(partsConnectedparticle, particlePos, gameObject.transform.rotation);
                     Destroy(Instanceparticle,3f);
-                      Destroy(rocketRigid);
+                    Destroy(rocketRigid);
                 }  
             } 
             else if(other.collider.tag == "Ground")
@@ -85,7 +68,6 @@ public class RocketCombine : MonoBehaviour
                 Destroy(gameObject); 
             }
         }
-        // rocketRigid.constraints = RigidbodyConstraints2D.None;
     }
 
     private void OnCollisionExit2D(Collision2D other) {

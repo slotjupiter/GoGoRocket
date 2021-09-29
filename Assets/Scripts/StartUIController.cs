@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +10,7 @@ public class StartUIController : MonoBehaviour
     public Transform targetPosition;
     public GameObject startTextObject;
     public Text startText;
-    [SerializeField] private AudioSource audio;
+    [SerializeField] private AudioSource aud;
     [SerializeField] SceneTransition sceneTransition;
     Camera cameraHandler;
     Text pressanykeyText;
@@ -77,7 +77,7 @@ public class StartUIController : MonoBehaviour
     }
 
       IEnumerator LoadingAsyncScene()
-    {   audio.Play();
+    {   GetComponent<AudioSource>().Play();
         sceneTransition.FadeInFadeOut();
         yield return new WaitForSeconds(1f);
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("CutScene");

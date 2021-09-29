@@ -13,7 +13,6 @@ public class RocketController : MonoBehaviour
     float magnitude = 0.5f;
     float skyValue;
     float durationSkyChange = 1f;
-    public float damage;
     public bool takeDamage;
     
 
@@ -21,7 +20,7 @@ public class RocketController : MonoBehaviour
     {   
         skyValue = 0;
         takeDamage = false;
-
+        
         rcRigid = gameObject.GetComponent<Rigidbody2D>();
         controller = GameObject.Find("ControlManager").GetComponent<Controller>();
         soundmanage = FindObjectOfType<SoundManager>();

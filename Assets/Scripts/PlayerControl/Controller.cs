@@ -183,8 +183,16 @@ public class Controller : MonoBehaviour
     IEnumerator CreateRocket(float timeSpawn)
     {   
            yield return new WaitForSeconds(timeSpawn); 
-            index++;
-            rocketBlock = Instantiate(rocketParts[index], spawnrocketPoint.transform.position, transform.rotation);
+
+            if(index < rocketParts.Length - 1)
+            {   index++;
+                rocketBlock = Instantiate(rocketParts[index], spawnrocketPoint.transform.position, transform.rotation); 
+            }   
+            else 
+            {
+                yield break;
+            }
+    
             dropRK = false;
             craneMovement.goUp(2f);
             craneMovement.speed += craneUpSpeed;
